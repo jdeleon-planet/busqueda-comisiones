@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Busqueda de Comisiones</title>
+
+  <style>
+    :root {
+      --gray: #858688;
+      --blue: #2C375C;
+      --yellow: #FECB28;
+      --bg: #f5f6f8;
+      --white: #ffffff;
+      --border: #d9dce3;
+      --text: #1f2933;
+      --danger: #b00020;
+      --success: #166534;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--blue);
+      color: var(--white);
+      padding: 22px 28px;
+      border-bottom: 6px solid var(--yellow);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.3px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      color: #e8eaf0;
+      font-size: 14px;
+    }
+
+    main {
+      padding: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      padding: 22px;
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      margin: 0 0 16px;
+      color: var(--blue);
+      font-size: 20px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--blue);
+    }
+
+    input {
+      width: 100%;
+      height: 42px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 14px;
+      outline: none;
+      background: var(--white);
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(44, 55, 92, 0.12);
+    }
+
+    .combo {
+      position: relative;
+    }
+
+    .combo-input {
+      padding-right: 34px;
+    }
+
+    .combo-arrow {
+      position: absolute;
+      right: 10px;
+      top: 34px;
+      color: var(--gray);
+      pointer-events: none;
+      font-size: 14px;
+    }
+
+    .combo-list {
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      right: 0;
+      top: 70px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+      max-height: 260px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .combo-list.open {
+      display: block;
+    }
+
+    .combo-option {
+      padding: 10px 12px;
+      font-size: 13px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f1f4;
+    }
+
+    .combo-option:hover,
+    .combo-option.active {
+      background: #f7f3df;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    .combo-empty {
+      padding: 10px 12px;
+      font-size: 13px;
+      color: var(--gray);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 11px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--blue);
+    }
+
+    .btn-secondary {
+      background: var(--blue);
+      color: var(--white);
+    }
+
+    .btn-light {
+      background: #eef0f5;
+      color: var(--blue);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 14px;
+      color: var(--gray);
+    }
+
+    .status.error {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .status.success {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--white);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1300px;
+    }
+
+    thead th {
+      background: var(--blue);
+      color: var(--white);
+      font-size: 12px;
+      text-align: center;
+      padding: 10px 8px;
+      border-right: 1px solid rgba(255,255,255,0.18);
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody td {
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--border);
+      border-right: 1px solid #eef0f5;
+      font-size: 12px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    tfoot td {
+      padding: 10px 8px;
+      font-weight: 700;
+      background: #f0f2f7;
+      border-top: 3px solid var(--blue);
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-left: 5px solid var(--yellow);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .summary-box span {
+      display: block;
+      color: var(--gray);
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .summary-box strong {
+      color: var(--blue);
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 1000px) {
+      .filters {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 14px;
+      }
+
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+    }
+
+    @media print {
+      header, .card.filters-card, .actions, .status {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
+      .card {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 10px;
+      }
+
+      thead th,
+      tbody td,
+      tfoot td {
+        font-size: 9px;
+        padding: 4px;
+      }
+
+      @page {
+        size: landscape;
+        margin: 0.25in;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Busqueda de Comisiones</h1>
+    <p>Consulta conectada a Google Sheets</p>
+  </header>
+
+  <main>
+    <section class="card filters-card">
+      <h2>Filtros de Busqueda</h2>
+
+      <div class="filters">
+        <div class="combo">
+          <label for="consultor">Consultor</label>
+          <input id="consultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <span class="combo-arrow">▼</span>
+          <div id="consultorList" class="combo-list"></div>
+        </div>
+
+        <div class="combo">
+          <label for="cliente">Nombre del Cliente</label>
+          <input id="cliente" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <span class="combo-arrow">▼</span>
+          <div id="clienteList" class="combo-list"></div>
+        </div>
+
+        <div class="combo">
+          <label for="idGoFormz">ID de GoFormz</label>
+          <input id="idGoFormz" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <span class="combo-arrow">▼</span>
+          <div id="idGoFormzList" class="combo-list"></div>
+        </div>
+
+        <div>
+          <label for="fechaDesde">Fecha Desde</label>
+          <input id="fechaDesde" type="date" />
+        </div>
+
+        <div>
+          <label for="fechaHasta">Fecha Hasta</label>
+          <input id="fechaHasta" type="date" />
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="buscarComisiones()">Buscar Comisiones</button>
+        <button class="btn-light" onclick="limpiarBusqueda()">Limpiar Busqueda</button>
+        <button class="btn-secondary" onclick="window.print()">Imprimir</button>
+      </div>
+
+      <div id="status" class="status">Cargando listas de busqueda...</div>
+    </section>
+
+    <section id="resultsCard" class="card hidden">
+      <h2>Resultados</h2>
+
+      <div id="summary" class="summary"></div>
+
+      <div class="table-wrap">
+        <table id="resultsTable">
+          <thead></thead>
+          <tbody></tbody>
+          <tfoot></tfoot>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzdRL9AQHvV-6oH31SrOH58-xZ4XnLPWicAgp2A2ew6jjHlAYG4lELarRvHEAV1a2i3/exec';
+    const API_KEY = 'Planet@2026@';
+
+    const state = {
+      consultores: [],
+      clientes: [],
+      idsGoFormz: []
+    };
+
+    const moneyHeaders = [
+      'Pago Gross',
+      'Reserva de Chargeback',
+      'M2 Add-ons',
+      'Descuento 10%',
+      'Pago Final'
+    ];
+
+    document.addEventListener('DOMContentLoaded', cargarOpciones);
+
+    async function cargarOpciones() {
+      const status = document.getElementById('status');
+      status.className = 'status';
+      status.textContent = 'Cargando listas de busqueda...';
+
+      const params = new URLSearchParams({
+        key: API_KEY,
+        action: 'options'
+      });
+
+      try {
+        const response = await fetch(`${API_URL}?${params.toString()}`);
+        const data = await response.json();
+
+        if (!data.ok) {
+          throw new Error(data.error || 'No se pudieron cargar los dropdowns.');
+        }
+
+        state.consultores = data.options.consultores || [];
+        state.clientes = data.options.clientes || [];
+        state.idsGoFormz = data.options.idsGoFormz || [];
+
+        setupCombo('consultor', 'consultorList', state.consultores);
+        setupCombo('cliente', 'clienteList', state.clientes);
+        setupCombo('idGoFormz', 'idGoFormzList', state.idsGoFormz);
+
+        status.className = 'status success';
+        status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar.';
+
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'Error cargando listas: ' + error.message;
+      }
+    }
+
+    function setupCombo(inputId, listId, options) {
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+
+      input.addEventListener('focus', function() {
+        renderComboList(input, list, options);
+      });
+
+      input.addEventListener('input', function() {
+        renderComboList(input, list, options);
+      });
+
+      input.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          list.classList.remove('open');
+        }
+      });
+    }
+
+    function renderComboList(input, list, options) {
+      const query = input.value.trim().toLowerCase();
+      list.innerHTML = '';
+
+      const matches = options
+        .filter(option => String(option).toLowerCase().includes(query))
+        .slice(0, 100);
+
+      if (matches.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'combo-empty';
+        empty.textContent = 'No hay resultados';
+        list.appendChild(empty);
+        list.classList.add('open');
+        return;
+      }
+
+      matches.forEach(option => {
+        const item = document.createElement('div');
+        item.className = 'combo-option';
+        item.textContent = option;
+
+        item.addEventListener('mousedown', function(event) {
+          event.preventDefault();
+          input.value = option;
+          list.classList.remove('open');
+        });
+
+        list.appendChild(item);
+      });
+
+      list.classList.add('open');
+    }
+
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.combo')) {
+        document.querySelectorAll('.combo-list').forEach(list => {
+          list.classList.remove('open');
+        });
+      }
+    });
+
+    function getFilters() {
+      return {
+        consultor: document.getElementById('consultor').value.trim(),
+        cliente: document.getElementById('cliente').value.trim(),
+        idGoFormz: document.getElementById('idGoFormz').value.trim(),
+        fechaDesde: document.getElementById('fechaDesde').value,
+        fechaHasta: document.getElementById('fechaHasta').value
+      };
+    }
+
+    function hasAnyFilter(filters) {
+      return Object.values(filters).some(value => value);
+    }
+
+    function validateDropdownValues(filters) {
+      if (filters.consultor && !state.consultores.includes(filters.consultor)) {
+        return 'Selecciona un consultor valido desde la lista.';
+      }
+
+      if (filters.cliente && !state.clientes.includes(filters.cliente)) {
+        return 'Selecciona un cliente valido desde la lista.';
+      }
+
+      if (filters.idGoFormz && !state.idsGoFormz.includes(filters.idGoFormz)) {
+        return 'Selecciona un ID de GoFormz valido desde la lista.';
+      }
+
+      return '';
+    }
+
+    async function buscarComisiones() {
+      const status = document.getElementById('status');
+      const filters = getFilters();
+
+      if (!hasAnyFilter(filters)) {
+        status.className = 'status error';
+        status.textContent = 'Ingresa al menos un filtro para buscar.';
+        document.getElementById('resultsCard').classList.add('hidden');
+        return;
+      }
+
+      const validationError = validateDropdownValues(filters);
+
+      if (validationError) {
+        status.className = 'status error';
+        status.textContent = validationError;
+        document.getElementById('resultsCard').classList.add('hidden');
+        return;
+      }
+
+      status.className = 'status';
+      status.textContent = 'Buscando comisiones...';
+
+      const params = new URLSearchParams({
+        key: API_KEY,
+        ...filters
+      });
+
+      try {
+        const response = await fetch(`${API_URL}?${params.toString()}`);
+        const data = await response.json();
+
+        if (!data.ok) {
+          throw new Error(data.error || 'Error desconocido.');
+        }
+
+        renderResults(data);
+
+        status.className = 'status success';
+        status.textContent = `Busqueda completada. Resultados: ${data.rows.length}`;
+
+      } catch (error) {
+        status.className = 'status error';
+        status.textContent = 'Error: ' + error.message;
+        document.getElementById('resultsCard').classList.add('hidden');
+      }
+    }
+
+    function renderResults(data) {
+      const resultsCard = document.getElementById('resultsCard');
+      const table = document.getElementById('resultsTable');
+      const thead = table.querySelector('thead');
+      const tbody = table.querySelector('tbody');
+      const tfoot = table.querySelector('tfoot');
+
+      thead.innerHTML = '';
+      tbody.innerHTML = '';
+      tfoot.innerHTML = '';
+
+      if (!data.rows || data.rows.length === 0) {
+        resultsCard.classList.add('hidden');
+        return;
+      }
+
+      resultsCard.classList.remove('hidden');
+
+      const headerRow = document.createElement('tr');
+      data.headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = displayHeader(header);
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+
+      data.rows.forEach(row => {
+        const tr = document.createElement('tr');
+
+        row.forEach((value, index) => {
+          const td = document.createElement('td');
+          const header = data.headers[index];
+
+          if (moneyHeaders.includes(header)) {
+            td.textContent = formatMoney(value);
+          } else {
+            td.textContent = value ?? '';
+          }
+
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+
+      renderTotals(data.headers, data.totals, tfoot);
+      renderSummary(data.totals);
+    }
+
+    function renderTotals(headers, totals, tfoot) {
+      const totalRow = document.createElement('tr');
+
+      headers.forEach((header, index) => {
+        const td = document.createElement('td');
+
+        if (index === 0) {
+          td.textContent = 'TOTALES';
+        } else if (totals && Object.prototype.hasOwnProperty.call(totals, header)) {
+          td.textContent = formatMoney(totals[header]);
+        } else {
+          td.textContent = '';
+        }
+
+        totalRow.appendChild(td);
+      });
+
+      tfoot.appendChild(totalRow);
+    }
+
+    function renderSummary(totals) {
+      const summary = document.getElementById('summary');
+      summary.innerHTML = '';
+
+      moneyHeaders.forEach(header => {
+        const box = document.createElement('div');
+        box.className = 'summary-box';
+
+        const label = document.createElement('span');
+        label.textContent = displayHeader(header);
+
+        const value = document.createElement('strong');
+        value.textContent = formatMoney(totals && totals[header] ? totals[header] : 0);
+
+        box.appendChild(label);
+        box.appendChild(value);
+        summary.appendChild(box);
+      });
+    }
+
+    function displayHeader(header) {
+      if (header === 'Descuento 10%') return '10% Retencion de Hacienda';
+      return header;
+    }
+
+    function formatMoney(value) {
+      const number = Number(String(value ?? '').replace(/[$,]/g, ''));
+
+      if (Number.isNaN(number)) {
+        return value || '$0.00';
+      }
+
+      return number.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      });
+    }
+
+    function limpiarBusqueda() {
+      document.getElementById('consultor').value = '';
+      document.getElementById('cliente').value = '';
+      document.getElementById('idGoFormz').value = '';
+      document.getElementById('fechaDesde').value = '';
+      document.getElementById('fechaHasta').value = '';
+
+      document.getElementById('resultsCard').classList.add('hidden');
+
+      const status = document.getElementById('status');
+      status.className = 'status';
+      status.textContent = 'Selecciona al menos un filtro para buscar.';
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        buscarComisiones();
+      }
+    });
+  </script>
+</body>
+</html>
