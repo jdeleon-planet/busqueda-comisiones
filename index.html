@@ -71,7 +71,7 @@
 
     .filters {
       display: grid;
-      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      grid-template-columns: repeat(6, minmax(180px, 1fr));
       gap: 16px;
       align-items: start;
     }
@@ -362,6 +362,13 @@
 
       <div class="filters">
         <div class="combo">
+          <label for="emailConsultor">Email Consultor</label>
+          <input id="emailConsultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <span class="combo-arrow">▼</span>
+          <div id="emailConsultorList" class="combo-list"></div>
+        </div>
+
+        <div class="combo">
           <label for="consultor">Consultor</label>
           <input id="consultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
           <span class="combo-arrow">▼</span>
@@ -424,7 +431,8 @@
     const state = {
       consultores: [],
       clientes: [],
-      idsGoFormz: []
+      idsGoFormz: [],
+      emailsConsultores: []
     };
 
     const moneyHeaders = [
@@ -458,13 +466,15 @@
         state.consultores = data.options.consultores || [];
         state.clientes = data.options.clientes || [];
         state.idsGoFormz = data.options.idsGoFormz || [];
+        state.emailsConsultores = data.options.emailsConsultores || [];
 
+        setupCombo('emailConsultor', 'emailConsultorList', state.emailsConsultores);
         setupCombo('consultor', 'consultorList', state.consultores);
         setupCombo('cliente', 'clienteList', state.clientes);
         setupCombo('idGoFormz', 'idGoFormzList', state.idsGoFormz);
 
         status.className = 'status success';
-        status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar.';
+        status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar. Si usas Email Consultor, ese filtro manda sobre Consultor.';
 
       } catch (error) {
         status.className = 'status error';
@@ -535,6 +545,7 @@
 
     function getFilters() {
       return {
+        emailConsultor: document.getElementById('emailConsultor').value.trim(),
         consultor: document.getElementById('consultor').value.trim(),
         cliente: document.getElementById('cliente').value.trim(),
         idGoFormz: document.getElementById('idGoFormz').value.trim(),
@@ -548,6 +559,10 @@
     }
 
     function validateDropdownValues(filters) {
+      if (filters.emailConsultor && !state.emailsConsultores.includes(filters.emailConsultor)) {
+        return 'Selecciona un email de consultor valido desde la lista.';
+      }
+
       if (filters.consultor && !state.consultores.includes(filters.consultor)) {
         return 'Selecciona un consultor valido desde la lista.';
       }
@@ -719,6 +734,7 @@
     }
 
     function limpiarBusqueda() {
+      document.getElementById('emailConsultor').value = '';
       document.getElementById('consultor').value = '';
       document.getElementById('cliente').value = '';
       document.getElementById('idGoFormz').value = '';
