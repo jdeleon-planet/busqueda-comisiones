@@ -16,6 +16,8 @@
       --text: #1f2933;
       --danger: #b00020;
       --success: #166534;
+      --clear: #c0392b;
+      --clear-hover: #9f2d22;
     }
 
     * {
@@ -50,7 +52,7 @@
 
     main {
       padding: 24px;
-      max-width: 1600px;
+      max-width: 1700px;
       margin: 0 auto;
     }
 
@@ -71,7 +73,7 @@
 
     .filters {
       display: grid;
-      grid-template-columns: repeat(6, minmax(180px, 1fr));
+      grid-template-columns: repeat(6, minmax(170px, 1fr));
       gap: 16px;
       align-items: start;
     }
@@ -84,15 +86,23 @@
       color: var(--blue);
     }
 
+    .filter-field {
+      position: relative;
+    }
+
     input {
       width: 100%;
       height: 42px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 8px 44px 8px 10px;
       font-size: 14px;
       outline: none;
       background: var(--white);
+    }
+
+    .combo-input {
+      padding-right: 68px;
     }
 
     input:focus {
@@ -100,65 +110,65 @@
       box-shadow: 0 0 0 3px rgba(44, 55, 92, 0.12);
     }
 
-    .combo {
-      position: relative;
+    input:disabled {
+      background: #eef0f5;
+      color: #8a8f99;
+      cursor: not-allowed;
+      opacity: 0.75;
     }
 
-    .combo-input {
-      padding-right: 34px;
+    .filter-field.disabled label {
+      color: #8a8f99;
     }
+
+    .filter-field.disabled .combo-arrow {
+      opacity: 0.35;
+    }
+
 
     .combo-arrow {
       position: absolute;
-      right: 10px;
+      right: 12px;
       top: 34px;
       color: var(--gray);
       pointer-events: none;
-      font-size: 14px;
+      font-size: 13px;
+      line-height: 20px;
     }
 
     .clear-field {
       position: absolute;
-      right: 30px;
+      right: 34px;
       top: 30px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: none;
-      background: #eef0f5;
-      color: var(--gray);
-      font-size: 14px;
-      line-height: 22px;
+      width: 25px;
+      height: 25px;
+      border-radius: 999px;
+      border: 2px solid var(--white);
+      background: var(--clear);
+      color: var(--white);
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 18px;
       padding: 0;
       cursor: pointer;
       display: none;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+      z-index: 10;
     }
 
-    .clear-field:hover {
-      background: var(--yellow);
-      color: var(--blue);
-    }
-
-    .field-wrap {
-      position: relative;
-    }
-
-    .field-wrap .clear-field {
+    .filter-field:not(.combo) .clear-field {
       right: 10px;
     }
 
-    .has-value .clear-field {
+    .filter-field.has-value .clear-field {
       display: flex;
     }
 
-    .combo.has-value .combo-input {
-      padding-right: 58px;
-    }
-
-    .field-wrap.has-value input {
-      padding-right: 38px;
+    .clear-field:hover {
+      background: var(--clear-hover);
+      transform: scale(1.05);
     }
 
     .combo-list {
@@ -326,7 +336,13 @@
       display: none;
     }
 
-    @media (max-width: 1000px) {
+    @media (max-width: 1200px) {
+      .filters {
+        grid-template-columns: repeat(3, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 800px) {
       .filters {
         grid-template-columns: repeat(2, minmax(180px, 1fr));
       }
@@ -405,48 +421,48 @@
       <h2>Filtros de Busqueda</h2>
 
       <div class="filters">
-        <div class="combo">
+        <div class="filter-field combo">
           <label for="emailConsultor">Email Consultor</label>
           <input id="emailConsultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('emailConsultor', 'emailConsultorList')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('emailConsultor', 'emailConsultorList')" aria-label="Limpiar Email Consultor">×</button>
           <span class="combo-arrow">▼</span>
           <div id="emailConsultorList" class="combo-list"></div>
         </div>
 
-        <div class="combo">
+        <div class="filter-field combo">
           <label for="consultor">Consultor</label>
           <input id="consultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('consultor', 'consultorList')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('consultor', 'consultorList')" aria-label="Limpiar Consultor">×</button>
           <span class="combo-arrow">▼</span>
           <div id="consultorList" class="combo-list"></div>
         </div>
 
-        <div class="combo">
+        <div class="filter-field combo">
           <label for="cliente">Nombre del Cliente</label>
           <input id="cliente" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('cliente', 'clienteList')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('cliente', 'clienteList')" aria-label="Limpiar Cliente">×</button>
           <span class="combo-arrow">▼</span>
           <div id="clienteList" class="combo-list"></div>
         </div>
 
-        <div class="combo">
+        <div class="filter-field combo">
           <label for="idGoFormz">ID de GoFormz</label>
           <input id="idGoFormz" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('idGoFormz', 'idGoFormzList')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('idGoFormz', 'idGoFormzList')" aria-label="Limpiar ID GoFormz">×</button>
           <span class="combo-arrow">▼</span>
           <div id="idGoFormzList" class="combo-list"></div>
         </div>
 
-        <div class="field-wrap">
+        <div class="filter-field">
           <label for="fechaDesde">Fecha Desde</label>
           <input id="fechaDesde" type="date" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('fechaDesde')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('fechaDesde')" aria-label="Limpiar Fecha Desde">×</button>
         </div>
 
-        <div class="field-wrap">
+        <div class="filter-field">
           <label for="fechaHasta">Fecha Hasta</label>
           <input id="fechaHasta" type="date" />
-          <button type="button" class="clear-field" onclick="limpiarCampo('fechaHasta')" aria-label="Limpiar">×</button>
+          <button type="button" class="clear-field" onclick="limpiarCampo('fechaHasta')" aria-label="Limpiar Fecha Hasta">×</button>
         </div>
       </div>
 
@@ -522,11 +538,11 @@
         setupCombo('consultor', 'consultorList', state.consultores);
         setupCombo('cliente', 'clienteList', state.clientes);
         setupCombo('idGoFormz', 'idGoFormzList', state.idsGoFormz);
+        activarBotonesLimpiarCampos();
+        actualizarExclusionEmailConsultor();
 
         status.className = 'status success';
-        activarBotonesLimpiarCampos();
-
-        status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar. Si usas Email Consultor, ese filtro manda sobre Consultor.';
+        status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar. Si usas Email Consultor, Consultor se inhabilita; si usas Consultor, Email Consultor se inhabilita.';
 
       } catch (error) {
         status.className = 'status error';
@@ -539,10 +555,14 @@
       const list = document.getElementById(listId);
 
       input.addEventListener('focus', function() {
+        if (input.disabled) return;
         renderComboList(input, list, options);
       });
 
       input.addEventListener('input', function() {
+        actualizarBotonLimpiarCampo(input);
+        actualizarExclusionEmailConsultor();
+        if (input.disabled) return;
         renderComboList(input, list, options);
       });
 
@@ -578,6 +598,8 @@
         item.addEventListener('mousedown', function(event) {
           event.preventDefault();
           input.value = option;
+          actualizarBotonLimpiarCampo(input);
+          actualizarExclusionEmailConsultor();
           list.classList.remove('open');
         });
 
@@ -594,6 +616,104 @@
         });
       }
     });
+
+    function actualizarBotonLimpiarCampo(input) {
+      const wrapper = input.closest('.filter-field');
+
+      if (!wrapper) return;
+
+      if (input.value) {
+        wrapper.classList.add('has-value');
+      } else {
+        wrapper.classList.remove('has-value');
+      }
+    }
+
+    function activarBotonesLimpiarCampos() {
+      ['emailConsultor', 'consultor', 'cliente', 'idGoFormz', 'fechaDesde', 'fechaHasta'].forEach(function(id) {
+        const input = document.getElementById(id);
+
+        if (!input) return;
+
+        actualizarBotonLimpiarCampo(input);
+
+        input.addEventListener('input', function() {
+          actualizarBotonLimpiarCampo(input);
+        });
+
+        input.addEventListener('change', function() {
+          actualizarBotonLimpiarCampo(input);
+        });
+      });
+    }
+
+    function limpiarCampo(inputId, listId) {
+      const input = document.getElementById(inputId);
+
+      if (!input) return;
+
+      input.value = '';
+      actualizarBotonLimpiarCampo(input);
+      actualizarExclusionEmailConsultor();
+
+      if (listId) {
+        const list = document.getElementById(listId);
+        if (list) list.classList.remove('open');
+      }
+
+      input.focus();
+    }
+
+
+    function setCampoDeshabilitado(inputId, disabled) {
+      const input = document.getElementById(inputId);
+      if (!input) return;
+
+      const wrapper = input.closest('.filter-field');
+
+      input.disabled = disabled;
+
+      if (wrapper) {
+        if (disabled) {
+          wrapper.classList.add('disabled');
+        } else {
+          wrapper.classList.remove('disabled');
+        }
+      }
+
+      actualizarBotonLimpiarCampo(input);
+    }
+
+    function actualizarExclusionEmailConsultor() {
+      const emailInput = document.getElementById('emailConsultor');
+      const consultorInput = document.getElementById('consultor');
+      const emailList = document.getElementById('emailConsultorList');
+      const consultorList = document.getElementById('consultorList');
+
+      if (!emailInput || !consultorInput) return;
+
+      const emailTieneValor = Boolean(emailInput.value.trim());
+      const consultorTieneValor = Boolean(consultorInput.value.trim());
+
+      if (emailTieneValor) {
+        consultorInput.value = '';
+        if (consultorList) consultorList.classList.remove('open');
+        setCampoDeshabilitado('consultor', true);
+        setCampoDeshabilitado('emailConsultor', false);
+        return;
+      }
+
+      if (consultorTieneValor) {
+        emailInput.value = '';
+        if (emailList) emailList.classList.remove('open');
+        setCampoDeshabilitado('emailConsultor', true);
+        setCampoDeshabilitado('consultor', false);
+        return;
+      }
+
+      setCampoDeshabilitado('emailConsultor', false);
+      setCampoDeshabilitado('consultor', false);
+    }
 
     function getFilters() {
       return {
@@ -785,53 +905,6 @@
       });
     }
 
-
-    function actualizarBotonLimpiarCampo(input) {
-      const wrapper = input.closest('.combo') || input.closest('.field-wrap');
-
-      if (!wrapper) return;
-
-      if (input.value) {
-        wrapper.classList.add('has-value');
-      } else {
-        wrapper.classList.remove('has-value');
-      }
-    }
-
-    function activarBotonesLimpiarCampos() {
-      ['emailConsultor', 'consultor', 'cliente', 'idGoFormz', 'fechaDesde', 'fechaHasta'].forEach(function(id) {
-        const input = document.getElementById(id);
-
-        if (!input) return;
-
-        actualizarBotonLimpiarCampo(input);
-
-        input.addEventListener('input', function() {
-          actualizarBotonLimpiarCampo(input);
-        });
-
-        input.addEventListener('change', function() {
-          actualizarBotonLimpiarCampo(input);
-        });
-      });
-    }
-
-    function limpiarCampo(inputId, listId) {
-      const input = document.getElementById(inputId);
-
-      if (!input) return;
-
-      input.value = '';
-      actualizarBotonLimpiarCampo(input);
-
-      if (listId) {
-        const list = document.getElementById(listId);
-        if (list) list.classList.remove('open');
-      }
-
-      input.focus();
-    }
-
     function limpiarBusqueda() {
       document.getElementById('emailConsultor').value = '';
       document.getElementById('consultor').value = '';
@@ -840,15 +913,20 @@
       document.getElementById('fechaDesde').value = '';
       document.getElementById('fechaHasta').value = '';
 
-      document.getElementById('resultsCard').classList.add('hidden');
+      setCampoDeshabilitado('emailConsultor', false);
+      setCampoDeshabilitado('consultor', false);
 
-      const status = document.getElementById('status');
-      status.className = 'status';
       ['emailConsultor', 'consultor', 'cliente', 'idGoFormz', 'fechaDesde', 'fechaHasta'].forEach(function(id) {
         const input = document.getElementById(id);
         if (input) actualizarBotonLimpiarCampo(input);
       });
 
+      actualizarExclusionEmailConsultor();
+
+      document.getElementById('resultsCard').classList.add('hidden');
+
+      const status = document.getElementById('status');
+      status.className = 'status';
       status.textContent = 'Selecciona al menos un filtro para buscar.';
     }
 
