@@ -117,6 +117,50 @@
       font-size: 14px;
     }
 
+    .clear-field {
+      position: absolute;
+      right: 30px;
+      top: 30px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: #eef0f5;
+      color: var(--gray);
+      font-size: 14px;
+      line-height: 22px;
+      padding: 0;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .clear-field:hover {
+      background: var(--yellow);
+      color: var(--blue);
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-wrap .clear-field {
+      right: 10px;
+    }
+
+    .has-value .clear-field {
+      display: flex;
+    }
+
+    .combo.has-value .combo-input {
+      padding-right: 58px;
+    }
+
+    .field-wrap.has-value input {
+      padding-right: 38px;
+    }
+
     .combo-list {
       position: absolute;
       z-index: 20;
@@ -364,6 +408,7 @@
         <div class="combo">
           <label for="emailConsultor">Email Consultor</label>
           <input id="emailConsultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('emailConsultor', 'emailConsultorList')" aria-label="Limpiar">×</button>
           <span class="combo-arrow">▼</span>
           <div id="emailConsultorList" class="combo-list"></div>
         </div>
@@ -371,6 +416,7 @@
         <div class="combo">
           <label for="consultor">Consultor</label>
           <input id="consultor" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('consultor', 'consultorList')" aria-label="Limpiar">×</button>
           <span class="combo-arrow">▼</span>
           <div id="consultorList" class="combo-list"></div>
         </div>
@@ -378,6 +424,7 @@
         <div class="combo">
           <label for="cliente">Nombre del Cliente</label>
           <input id="cliente" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('cliente', 'clienteList')" aria-label="Limpiar">×</button>
           <span class="combo-arrow">▼</span>
           <div id="clienteList" class="combo-list"></div>
         </div>
@@ -385,18 +432,21 @@
         <div class="combo">
           <label for="idGoFormz">ID de GoFormz</label>
           <input id="idGoFormz" class="combo-input" type="text" placeholder="Escriba para buscar..." autocomplete="off" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('idGoFormz', 'idGoFormzList')" aria-label="Limpiar">×</button>
           <span class="combo-arrow">▼</span>
           <div id="idGoFormzList" class="combo-list"></div>
         </div>
 
-        <div>
+        <div class="field-wrap">
           <label for="fechaDesde">Fecha Desde</label>
           <input id="fechaDesde" type="date" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('fechaDesde')" aria-label="Limpiar">×</button>
         </div>
 
-        <div>
+        <div class="field-wrap">
           <label for="fechaHasta">Fecha Hasta</label>
           <input id="fechaHasta" type="date" />
+          <button type="button" class="clear-field" onclick="limpiarCampo('fechaHasta')" aria-label="Limpiar">×</button>
         </div>
       </div>
 
@@ -474,6 +524,8 @@
         setupCombo('idGoFormz', 'idGoFormzList', state.idsGoFormz);
 
         status.className = 'status success';
+        activarBotonesLimpiarCampos();
+
         status.textContent = 'Listas cargadas. Selecciona al menos un filtro para buscar. Si usas Email Consultor, ese filtro manda sobre Consultor.';
 
       } catch (error) {
@@ -733,6 +785,53 @@
       });
     }
 
+
+    function actualizarBotonLimpiarCampo(input) {
+      const wrapper = input.closest('.combo') || input.closest('.field-wrap');
+
+      if (!wrapper) return;
+
+      if (input.value) {
+        wrapper.classList.add('has-value');
+      } else {
+        wrapper.classList.remove('has-value');
+      }
+    }
+
+    function activarBotonesLimpiarCampos() {
+      ['emailConsultor', 'consultor', 'cliente', 'idGoFormz', 'fechaDesde', 'fechaHasta'].forEach(function(id) {
+        const input = document.getElementById(id);
+
+        if (!input) return;
+
+        actualizarBotonLimpiarCampo(input);
+
+        input.addEventListener('input', function() {
+          actualizarBotonLimpiarCampo(input);
+        });
+
+        input.addEventListener('change', function() {
+          actualizarBotonLimpiarCampo(input);
+        });
+      });
+    }
+
+    function limpiarCampo(inputId, listId) {
+      const input = document.getElementById(inputId);
+
+      if (!input) return;
+
+      input.value = '';
+      actualizarBotonLimpiarCampo(input);
+
+      if (listId) {
+        const list = document.getElementById(listId);
+        if (list) list.classList.remove('open');
+      }
+
+      input.focus();
+    }
+
     function limpiarBusqueda() {
       document.getElementById('emailConsultor').value = '';
       document.getElementById('consultor').value = '';
@@ -745,6 +844,11 @@
 
       const status = document.getElementById('status');
       status.className = 'status';
+      ['emailConsultor', 'consultor', 'cliente', 'idGoFormz', 'fechaDesde', 'fechaHasta'].forEach(function(id) {
+        const input = document.getElementById(id);
+        if (input) actualizarBotonLimpiarCampo(input);
+      });
+
       status.textContent = 'Selecciona al menos un filtro para buscar.';
     }
 
